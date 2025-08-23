@@ -1,0 +1,11 @@
+# Dependencias de Composer
+/vendor/
+composer.lock
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos temporales
+*.log
+*.cache
