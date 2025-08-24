@@ -1,0 +1,31 @@
+{
+  "name": "pardalesteban/orm-helper-php",
+  "description": "Mini ORM helper para PHP. Facilita el uso de PDO sin tener que crear un ORM desde cero cada vez.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Pardalesteban",
+      "email": "pardalesteban@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Pardalesteban\\OrmHelper\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^8.1"
+  },
+  "keywords": [
+    "php",
+    "orm",
+    "pdo",
+    "database",
+    "sql",
+    "library"
+  ],
+  "support": {
+    "source": "https://github.com/Pardalesteban/orm-helper-php"
+  }
+}
