@@ -82,7 +82,7 @@
             $stmt->execute();
         }
 
-        public function union($otherTable, $fields = '*', $where = '', $orderBy = '', $limit = '') {
+        public function union($otherTable, $fields = '*', $where = '', $orderBy = '', $limitSQL = '') {
             // $fields puede ser '*' o 'users.id, users.nombre, orders.total'
             $sql = "SELECT $fields FROM {$this->table} ";
             $sql .= "UNION SELECT $fields FROM $otherTable";
@@ -92,11 +92,40 @@
             if ($orderBy) {
                 $sql .= " ORDER BY $orderBy";
             }
-            if ($limit) {
-                $sql .= " LIMIT $limit";
+            if ($limitSQL) {
+                $sql .= " LIMIT $limitSQL";
             }
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        public function changeTable($newTable, $newPrimaryKey = null) {
+            $this->table = $newTable;
+            if ($newPrimaryKey) {
+                $this->primaryKey = $newPrimaryKey;
+            }
+        }
+
+        public function innerJoin($otherTable, $onCondition, $fields = '*', $options = []) {
+            $sql = "SELECT $fields FROM {$this->table} INNER JOIN $otherTable ON $onCondition";
+            $params = [];
+            if (!empty($options['where'])) {
+                $sql .= " WHERE " . $options['where'];
+                $params = $options['params'] ?? [];
+            }
+            if(!empty($options['groupBy'])) {
+                $sql .= " GROUP BY " . $options['groupBy'];
+            }
+            if (!empty($options['orderBy'])) {
+                $sql .= " ORDER BY " . $options['orderBy'];
+            }
+            if (!empty($options['limit'])) {
+                $sql .= " LIMIT " . $options['limit'];
+            }
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
