@@ -129,5 +129,94 @@
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        public function leftJoin($otherTable, $onCondition, $fields = '*', $options = []) {
+            $sql = "SELECT $fields FROM {$this->table} LEFT JOIN $otherTable ON $onCondition";
+            $params = [];
+            if (!empty($options['where'])) {
+                $sql .= " WHERE " . $options['where'];
+                $params = $options['params'] ?? [];
+            }
+            if(!empty($options['groupBy'])) {
+                $sql .= " GROUP BY " . $options['groupBy'];
+            }
+            if (!empty($options['orderBy'])) {
+                $sql .= " ORDER BY " . $options['orderBy'];
+            }
+            if (!empty($options['limit'])) {
+                $sql .= " LIMIT " . $options['limit'];
+            }
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        public function rightJoin($otherTable, $onCondition, $fields = '*', $options = []) {
+            $sql = "SELECT $fields FROM {$this->table} RIGHT JOIN $otherTable ON $onCondition";
+            $params = [];
+            if (!empty($options['where'])) {
+                $sql .= " WHERE " . $options['where'];
+                $params = $options['params'] ?? [];
+            }
+            if(!empty($options['groupBy'])) {
+                $sql .= " GROUP BY " . $options['groupBy'];
+            }
+            if (!empty($options['orderBy'])) {
+                $sql .= " ORDER BY " . $options['orderBy'];
+            }
+            if (!empty($options['limit'])) {
+                $sql .= " LIMIT " . $options['limit'];
+            }
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        public function fullOuterJoin($otherTable, $onCondition, $fields = '*', $options = []) {
+            $sql = "SELECT $fields FROM {$this->table} FULL OUTER JOIN $otherTable ON $onCondition";
+            $params = [];
+            if (!empty($options['where'])) {
+                $sql .= " WHERE " . $options['where'];
+                $params = $options['params'] ?? [];
+            }
+            if(!empty($options['groupBy'])) {
+                $sql .= " GROUP BY " . $options['groupBy'];
+            }
+            if (!empty($options['orderBy'])) {
+                $sql .= " ORDER BY " . $options['orderBy'];
+            }
+            if (!empty($options['limit'])) {
+                $sql .= " LIMIT " . $options['limit'];
+            }
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        public function join($tables = [], $onCondition=[], $innerOptions=[], $fields=[], $where=[]){
+        $sql = "SELECT  " .implode(',', $fields). " FROM {$this->table} $innerOptions[0] JOIN $tables[0] ON $onCondition[0]";
+        if(count($tables) != count($innerOptions)){
+            return "ERROR: YOU MUST PROVIDE INNER JOIN OPTIONS FOR EACH TABLE";
+        }
+        if(count($tables) > 1){
+            for($i=1;$i<count($tables);$i++){
+                $sql .= " $innerOptions[$i] JOIN $tables[$i] ON $onCondition[$i]";
+            }
+        }
+        if(!empty($where)){
+            $sql .= " WHERE " .  $where[0];
+            if(count($where) > 1){
+                for($i=1;$i<count($where);$i++){
+                    $sql .= " AND " . $where[$i];
+                }
+            }
+        }
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+}
+    
 ?>
