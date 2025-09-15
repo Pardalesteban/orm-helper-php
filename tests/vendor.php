@@ -1,9 +1,9 @@
 <?php
     //This example is using Composer's autoloader
-    require_once(__DIR__ . '/vendor/autoload.php');
+    require __DIR__.'vendor/autoload.php';
 
-    //use Pardalesteban\OrmHelper\Conn;
-    //use Pardalesteban\OrmHelper\Orm;
+    use Pardalesteban\OrmHelper\Conn;
+    use Pardalesteban\OrmHelper\queryBuilder;
     
     //Here we create a database connection
     $conn = new Conn('localhost', 'test_db', 'root', '');

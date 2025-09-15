@@ -97,7 +97,20 @@ final class queryBuilder{
      }
 
      public function whereMo(string $col, mixed $val): self{
-        //Terminar de escribir la funcion
+        $ph = $this->pushParam('w', $val);
+        $this->wheres[] = $this->quoteIdent($col)." > $ph";
+        return $this;
+     }
+
+     public function whereLe(string $col, mixed $val): self{
+        $ph = $this->pushParam('w', $val);
+        $this->wheres[] = $this->quoteIdent($col)." < $ph";
+        return $this;
+     }
+
+     public function whereDif(string $col, mixed $val): self{
+        $ph = $this->pushParam('w', $val);
+        $this->wheres[] = $this->quoteIdent($col)." != $ph";
         return $this;
      }
 }   
