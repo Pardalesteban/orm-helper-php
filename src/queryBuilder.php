@@ -31,6 +31,8 @@ final class queryBuilder{
     /** @var list<string> */
     private array $joins = []; //example: "inner join profiles on users.id = profile.user_id"
 
+    private ?array $lastresult = [];
+
     public function __construct(PDO $pdo, string $table, string $primaryKey = 'id'){
         $this->pdo = $pdo;
         $this->table = $table;
@@ -80,7 +82,7 @@ final class queryBuilder{
     public function where(string $expr, array $bind = []): self{
         $this->wheres[] = $expr;
         foreach($bind as $k => $v){
-            $ph = is_string($k) && $k !== '' && $k[0] !== ':' ? ":k" : $k; 
+            $ph = (is_string($k) && $k !== '' && $k[0] !== ':') ? ":$k" : $k;
             $this->params[$ph] = $v;
         }
         return $this;
@@ -112,5 +114,64 @@ final class queryBuilder{
         $ph = $this->pushParam('w', $val);
         $this->wheres[] = $this->quoteIdent($col)." != $ph";
         return $this;
+     }
+
+     public function order(string $col, string $dir = 'ASC'): self{
+        $dir = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
+        $this->orderBy[] = $this->quoteIdent($col)." $dir";
+        return $this;
+     }
+
+     public function limit(string $n, ?int $offset = null): self{
+        $this->limit = max(0,$n);
+        $this->offset = $offset !== null ? max(0, $offset) : null;
+        return $this;
+     }
+    
+     //get the result of the SQL sentence
+     public function get(): array{
+        $stmt = $this->pdo->prepare($this->toSql());
+        foreach($this->params as $k => $v){
+            $stmt->bindValue($k, $v);
+        }
+        $stmt->execute();
+        $this->lastresult = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->lastresult;
+     }
+     //Creates the SQL sentence
+     public function toSql(): string {
+        $cols = $this->columns === null || $this->columns === [] 
+            ? '*'
+            : implode(', ', array_map(fn($c) => $this->quoteIdent($c), $this->columns));
+
+        $sql = "SELECT {$cols} FROM " . $this->quoteIdent($this->table);
+
+        if ($this->joins) {
+            $sql .= ' ' . implode(' ', $this->joins);
+        }
+        if ($this->wheres) {
+            $sql .= ' WHERE ' . implode(' AND ', $this->wheres);
+        }
+        if ($this->groupBy) {
+            $sql .= ' GROUP BY ' . implode(', ', array_map(fn($c) => $this->quoteIdent($c), $this->groupBy));
+        }
+        if ($this->orderBy) {
+            $sql .= ' ORDER BY ' . implode(', ', $this->orderBy);
+        }
+        if ($this->limit !== null) {
+            $sql .= ' LIMIT ' . $this->limit;
+            if ($this->offset !== null) {
+                $sql .= ' OFFSET ' . $this->offset;
+            }
+        }
+        return $sql;
+    }
+ 
+
+     public function __toString(): string{
+        if($this->lastresult !== null){
+            return json_encode($this->lastresult, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        }
+        return $this->toSql();
      }
 }   
