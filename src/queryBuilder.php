@@ -92,6 +92,22 @@ final class queryBuilder{
      * Not manual bind
      */
 
+    
+     public function innerJoin(string $otherTable, mixed $pm1, mixed $pm2): self{
+        $this->joins[] = "inner join ".$this->quoteIdent($otherTable)." on ".$this->table.".".$this->quoteIdent($pm1)."=".$this->quoteIdent($otherTable).".".$this->quoteIdent($pm2);   
+        return $this;
+     }
+     
+     public function leftJoin(string $otherTable, mixed $pm1, mixed $pm2): self{
+        $this->joins[] = "left join ".$this->quoteIdent($otherTable)." on ".$this->quoteIdent($pm1)."=".$this->quoteIdent($pm2);   
+        return $this;     
+     }
+
+     public function rightJoin(string $otherTable, mixed $pm1, mixed $pm2): self{
+        $this->joins[] = "left join ".$this->quoteIdent($otherTable)." on ".$this->quoteIdent($pm1)."=".$this->quoteIdent($pm2);   
+        return $this;     
+     }
+
      public function whereEq(string $col, mixed $val): self{
         $ph = $this->pushParam('w', $val);
         $this->wheres[] = $this->quoteIdent($col)." = $ph";
