@@ -1,8 +1,9 @@
 <?php
     //If you use locally use this libraries
+    require __DIR__.'vendor/autoload.php';
 
-    require_once(__DIR__ . '/../src/orm.php');
-    require_once(__DIR__ . '/../src/conn.php');
+    use Pardalesteban\OrmHelper\Conn;
+    use Pardalesteban\OrmHelper\queryBuilder;
 
     //if you use Composer's autoloader use
 
